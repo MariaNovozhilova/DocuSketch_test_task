@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from line_profiler_pycharm import profile
 
 
 url = "https://ai-process-sandy.s3.eu-west-1.amazonaws.com/purge/deviation.json"
@@ -20,15 +21,15 @@ class PlotDrawer:
         plt.plot(*source_series)
 
 
-def draw_plots(url, *columns):
-    df = pd.read_json(url)
+@profile
+def draw_plots(source_url, *columns):
+    df = pd.read_json(source_url)
     drawer = PlotDrawer(df, *columns)    
     drawer.plot()   
 
     results_dir = 'plots'
     
     if not os.path.exists(results_dir):
-        plot_counter = 0
         os.makedirs(results_dir)
 
     plot_counter = len([name for name in os.listdir('plots')])
@@ -36,6 +37,6 @@ def draw_plots(url, *columns):
    
     plt.savefig(os.path.join(results_dir, plot_file_name))
 
-  
 
-draw_plots(url, 'max', 'mean', 'min')
+if __name__ == '__main__':
+    draw_plots(url, 'max', 'mean', 'min')
